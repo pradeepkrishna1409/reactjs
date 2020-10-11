@@ -1,53 +1,66 @@
-import React, { useState, useEffect } from "react";
-import MaterialResource from "./Material_Resource"
-import MaterialTableDemo from "./Material_Project"
-import 'bootstrap/dist/css/bootstrap.min.css';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown'
-//import '../../assets/App.css';
+import React from "react";
+import { Tabs, Tab, AppBar } from "@material-ui/core";
+import Visualization from "../components/Visualization";
+import MaterialProject from "../components/Material_Project";
+import MaterialResource from "../components/Material_Resource";
+import { makeStyles } from '@material-ui/core/styles';
+import AccessAlarmTwoToneIcon from '@material-ui/icons/AccessAlarmTwoTone';
+import PollIcon from '@material-ui/icons/Poll';
+import PersonIcon from '@material-ui/icons/Person';
 
-const Home = () => {
-    const [value,setValue]=useState('proj');
-    const handleSelect=(e)=>{
-      console.log(e);
-      setValue(e)
+const useStyles = makeStyles({
+    root: {
+      flexGrow: 1,
+      maxWidth: 500,
+      tabHeight : '24px'
+    },
+    wrapper: {
+      flexDirection: 'row'
     }
-   
+  });
 
-  useEffect(function() {
-      console.log( 'making an api call since value has changed to ' + value );
-  }, [ value ] )
+const Home = props => {
+  const classes = useStyles();
 
-  let el;
+  const [selectedTab, setSelectedTab] = React.useState(0);
+  const [Pagesize, setPagesize] = React.useState(window.localStorage.getItem( 'page_set' ) || 20);
+  const [searchTerm, setsearchTerm] = React.useState('dy');
+  // let ref = React.createRef();
 
-  switch( value ) {
-      case 'proj':
-          el = <MaterialTableDemo />
-          break;
-      case 'res':
-          el = <MaterialResource />
-          break;
-  }
+  // React.useEffect(() => {
+  //   if( )
+  //   window.localStorage.setItem("page_set", 20);
+  //   window.location.reload();
+  // });
+
+  const handleChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
+
+
 
   return (
-    <React.Fragment>
-
-    <DropdownButton
-    dropup center-block
-    style={{ marginLeft: 120, marginTop: 15, marginBottom: 15, width : 25 }}
-    title="Table Name"
-    variant="success"
-    onSelect={handleSelect}
-    className="my-custom-dropdown"
+    <>
+    <Tabs
+      value={selectedTab}
+      onChange={handleChange}
+      variant="fullWidth"
+      indicatorColor="secondary"
+      backgroundColor="#FDFEFE"
+      textColor="primary"
+      disableUnderline={true}
+      className={classes.wrapper}
     >
-            <Dropdown.Item eventKey="proj">Project Schedule</Dropdown.Item>
-            <Dropdown.Item eventKey="res">Resource Assignment</Dropdown.Item>
-    </DropdownButton>
-      {el}  
-    </React.Fragment>
+      <Tab label={<div><AccessAlarmTwoToneIcon style={{verticalAlign: 'middle'}} /> Add & Assign Project </div>} />
+      <Tab label={<div><PersonIcon style={{verticalAlign: 'middle'}} /> Add & Assign Resource </div>} />
+      <Tab label={<div><PollIcon style={{verticalAlign: 'middle'}} /> Visualization </div>} />
 
-    
-);
-}
+    </Tabs>
+      {selectedTab === 0 && <MaterialProject Pagesize={Pagesize} SetPagesize={setPagesize} searchTerm={searchTerm} setsearchTerm={setsearchTerm}/>}
+      {selectedTab === 1 && <MaterialResource Pagesize={Pagesize} SetPagesize={setPagesize} searchTerm={searchTerm} setsearchTerm={setsearchTerm}/>}
+      {selectedTab === 2 && <Visualization />}
+    </>
+  );
+};
 
 export default Home;
